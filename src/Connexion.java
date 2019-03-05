@@ -18,12 +18,12 @@ public class Connexion {
     private Connexion() throws SQLException {
         try {
             this.connection = DriverManager.getConnection(DATABASE_URL, USERNAME, PASSWORD);
-            System.out.print("connected");
+
         }catch (SQLException e){
             System.out.print(e);
         }finally {
             if (this.connection != null){
-                this.connection.close();
+             //   this.connection.close();
             }
         }
     }

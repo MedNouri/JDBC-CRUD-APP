@@ -45,8 +45,8 @@ public class Client {
 
 
     // les constructeurs
-    public Client(int id, String nom, String adresse,String telephone) {
-        this.id = id;
+    public Client( String nom, String adresse,String telephone) {
+
         this.nom = nom;
         this.adresse = adresse;
         this.telephone = telephone;
