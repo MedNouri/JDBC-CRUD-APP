@@ -11,8 +11,8 @@ public class Commande {
     private Date date ;
 
 
-    public Commande(int id, int idclient, String pttc, Date date) {
-        this.id = id;
+    public Commande(  int idclient, String pttc, Date date) {
+
         this.idclient = idclient;
         this.pttc = pttc;
         this.date = date;

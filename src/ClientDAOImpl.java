@@ -1,4 +1,5 @@
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
@@ -10,9 +11,41 @@ public class ClientDAOImpl implements InterfaceDAO<Client> {
     ResultSet rs = null;
     @Override
     public List<Client> getAll() {
-        return null;
-    }
 
+      List<Client> users  = new ArrayList<>();
+        try {
+
+            con = Connexion.getInstance().getConnection();
+            stmt = con.createStatement();
+            String query=
+                    "SELECT * FROM client  ";
+
+
+            rs = stmt.executeQuery(query);
+
+
+            while (rs.next()) {
+                String name = rs.getString("nom");
+                String adresse = rs.getString("adresse");
+                String telephone = rs.getString("telephone");
+                Client Foundelement = new Client(name,adresse,telephone);
+                users.add(Foundelement);
+            }
+
+
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return users;
+
+    }
+    private static java.sql.Date convertUtilToSql(java.util.Date uDate) {
+        java.sql.Date sDate = new java.sql.Date(uDate.getTime());
+        return sDate;
+    }
     @Override
     public int insert(Client c) {
 
@@ -53,15 +86,68 @@ public class ClientDAOImpl implements InterfaceDAO<Client> {
     @Override
     public int delete(int id) {
 
+        try {
+
+            con = Connexion.getInstance().getConnection();
+            stmt = con.createStatement();
+
+            String sql = "DELETE FROM client " +
+                    "WHERE id = "+ id;
+            stmt.executeUpdate(sql);
+
+            while (rs.next()) {
+        System.out.print("Client deleted");
+                return 1;
+            }
 
 
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
 
         return 0;
+
+
+
     }
 
     @Override
     public int update(Client c) {
+
+
+        try {
+
+            con = Connexion.getInstance().getConnection();
+            stmt = con.createStatement();
+
+            String sql =    "UPDATE client SET nom = 'Lille' ";
+            stmt.executeUpdate(sql);
+            String query=
+                    "SELECT * FROM client ";
+
+
+            rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+                String name = rs.getString("nom");
+                String adresse = rs.getString("adresse");
+                String telephone = rs.getString("telephone");
+                Client Foundelement = new Client(name,adresse,telephone);
+
+                return 0;
+            }
+
+
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
         return 0;
     }
 
@@ -87,7 +173,7 @@ public class ClientDAOImpl implements InterfaceDAO<Client> {
 
                 return Foundelement;
             }
-            System.out.println();
+
 
 
         } catch (SQLException e) {
@@ -105,9 +191,9 @@ public class ClientDAOImpl implements InterfaceDAO<Client> {
 
             con = Connexion.getInstance().getConnection();
             stmt = con.createStatement();
-            String query=
-                    String.format("SELECT * FROM client WHERE nom like %s", name);
 
+            String query=
+                    "SELECT * FROM client WHERE nom = "+ name;
 
             rs = stmt.executeQuery(query);
 
