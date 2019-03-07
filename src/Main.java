@@ -3,32 +3,20 @@ import java.util.*;
 import java.util.Date;
 
 public class Main {
-
-    private static final String DATABASE_URL = "jdbc:mysql://localhost/BDClient";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "FOSRoKl6pJ7VZ6ay";
-    private static Scanner scan= new Scanner(System.in);
+    private static CommandeDAOImpl commande = new CommandeDAOImpl();
+    private static Scanner scan = new Scanner(System.in);
+    private static ClientDAOImpl clientDAO = new ClientDAOImpl();
     public static void main(String[] args) throws SQLException {
 
 
-        Connection connection = null;
-        try {
-           connection = Connexion.getInstance().getConnection();
-
             functionDisplayMenu();
-        }catch (SQLException e){
-            System.out.print(e);
-        }finally {
-            if (connection != null){
-               // connection.close();
-            }
-        }
+
 
     }
 
 
     public static void functionDisplayMenu(){
-        System.out.print("\n---------------------Menu---------------------\n");
+        System.out.println("\n---------------------Menu---------------------\n");
         System.out.println("1- Gestion des Clients");
         System.out.println("2- Gestion des Commande");
         System.out.println("3- Quitter le programme");
@@ -37,11 +25,14 @@ public class Main {
         do {
            if (text == 1){
                GestionDesClient();
+               return;
            }else if (text == 2) {
                GestionDesCommande();
+               return;
            }
            else if (text == 3) {
                closeout();
+               return;
            }
 
 
@@ -58,7 +49,8 @@ public class Main {
         System.out.println("6- Affichier la liste des clients");
         System.out.println("7- Afficher nobmbre de Commande par Client");
         System.out.println("8- Suppreimer Client qui n'ont pas des commande ");
-        System.out.println("9- Afficher Client par idd Commande");
+
+        System.out.println("9- Afficher Client par id Commande");
 
         System.out.println("10- Aller au MENU PRINCIPAL");
 
@@ -70,14 +62,16 @@ public class Main {
                 return;
 
             }else if (text == 2) {
+                //Search un Client
                 SearchClient();
                 return;
             }
             else if (text == 3) {
+                //Search un Client with Name
                 ChercherClientNom();
                 return;
             }else if (text == 4){
-                updateClien();
+                updateClient();
                 return;
 
             }else if (text == 5){
@@ -96,12 +90,12 @@ public class Main {
 
             }
             else if (text == 8){
-                DeleteifnoCommande();
+                SuppreimerWithNoCommande();
                 return;
 
             }
             else if (text == 9){
-                SuppreimerWithNoCommande();
+                ShowInfo();
                 return;
 
             }
@@ -118,13 +112,29 @@ public class Main {
 
     }
 
-    private static void DeleteifnoCommande() {
+    private static void ShowInfo() {
+       clientDAO.ShowCommandeAndCleint() ;
+        functionDisplayMenu();
+
     }
 
     private static void SuppreimerWithNoCommande() {
+        if (clientDAO.deleteNoCommande() == 1){
+            System.out.println("Done 100% success");
+        }
+        else{
+            System.out.println("Sorry Not Found ");
+        }
+        functionDisplayMenu();
     }
 
     private static void DisplayClientnbrCommande() {
+
+        for (Client user: clientDAO.getAllParCommande()) {
+            user.Display();
+
+        }
+        functionDisplayMenu();
     }
 
 
@@ -132,18 +142,39 @@ public class Main {
 
     private static void Supprimer() {
         System.out.println("  Supprimer un Client");
-        ClientDAOImpl clientDAO = new ClientDAOImpl();
 
-        clientDAO.delete(1221215);
+        Scanner scan = new Scanner(System.in);
+        System.out.println("  Donner ID CLIENT ");
 
+        int id = scan.nextInt();
+        if (clientDAO.delete(id) == 1){
+            System.out.println("Done 100% success");
+        }
+        else{
+            System.out.println("Sorry Not Found ");
+        }
+        functionDisplayMenu();
     }
 
-    public static  void updateClien(){
+    public static  void updateClient(){
         System.out.println("  Modiffier un Client");
+        Scanner scan = new Scanner(System.in);
+        System.out.println("  Donner ID CLIENT ");
+
+        int id = scan.nextInt();
         ClientDAOImpl clientDAO = new ClientDAOImpl();
-        Client RecivedCleint =  clientDAO.findById(1221215);
-        System.out.print(RecivedCleint.getAdresse());
-        clientDAO.update(RecivedCleint);
+        Client RecivedCleint =  clientDAO.findById(id);
+
+        if (RecivedCleint != null) {
+            System.out.println("user was Found");
+            RecivedCleint.Display();
+            clientDAO.update(RecivedCleint);
+        }else{
+            System.out.println("Sorry Not Found ");
+        }
+        System.out.println("Done 100% success");
+        functionDisplayMenu();
+
 
     }
     public static  void GestionDesCommande(){
@@ -199,34 +230,72 @@ public class Main {
     }
 
     private static void updateCommande() {
+
+
+        System.out.println("  Modiffier une Commande");
+        Scanner scan = new Scanner(System.in);
+        System.out.println("  Donner ID Commande ");
+
+        int id = scan.nextInt();
+
+        Commande c =  commande.findById(id);
+
+        if (c != null) {
+            System.out.println("Commande was Found");
+            c.Display();
+            commande.update(c);
+        }else{
+            System.out.println("Sorry Not Found ");
+        }
+        System.out.println("Done 100% success");
+        functionDisplayMenu();
+
+
     }
 
     private static void SeachCommandeWithNameClient() {
+        System.out.println("   Supprimer Une Commande");
+        CommandeDAOImpl commande = new CommandeDAOImpl();
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Ecrire Nom Client ");
+        String name = scan.nextLine();
+        Commande Recived = commande.findByName(name);
+        System.out.println("*************Result 100% success**************");
+        if (Recived  != null) {
+            Recived.Display();
+        }else{
+            System.out.println("Sorry Not Found ");
+        }
+        functionDisplayMenu();
     }
 
     private static void SupprimerCommande() {
         System.out.println("   Supprimer Une Commande");
-        CommandeDAOImpl commande = new CommandeDAOImpl();
 
-        commande.delete(1);
+        System.out.println("Ecrire id commande ");
+        int id = scan.nextInt();
+
+        if (commande.delete(id) == 1){
+            System.out.println("Done 100% success");
+        }
+        else{
+            System.out.println("Sorry Not Found ");
+        }
+
     }
 
     private static void ShowAllcommandes() {
-        CommandeDAOImpl commande = new CommandeDAOImpl();
+
 
         for (Commande RecivedCleint: commande.getAll()) {
-            System.out.println("**********************************************");
-            System.out.println(" Pttc " + RecivedCleint.getPttc());
-            System.out.println("Date " + RecivedCleint.getDate());
-            System.out.println("client ID " + RecivedCleint.getIdclient());
-            System.out.println("**********************************************");
+            RecivedCleint.Display();
 
         }
 
     }
 
     private static void SeachCommandeID() {
-        CommandeDAOImpl commande = new CommandeDAOImpl();
+
         Scanner scan = new Scanner(System.in);
         System.out.println("Chercher Commande   ");
 
@@ -236,19 +305,16 @@ public class Main {
         Commande RecivedCleint =  commande.findById(id);
         System.out.println("*************Result 100% success**************");
         if (RecivedCleint != null) {
-            System.out.println(" Pttc " + RecivedCleint.getPttc());
-            System.out.println("Date " + RecivedCleint.getDate());
-            System.out.println("client ID " + RecivedCleint.getIdclient());
-            System.out.println("**********************************************");
+           RecivedCleint.Display();
         }else{
             System.out.println("Sorry Not Found ");
         }
-        GestionDesClient();
+        functionDisplayMenu();
 
     }
 
     private static void AjouterunCommande() {
-        CommandeDAOImpl commande = new CommandeDAOImpl();
+
         Scanner scan = new Scanner(System.in);
         System.out.println("Ajouter une commande ");
 
@@ -261,18 +327,22 @@ public class Main {
         Commande newC = new Commande(id,pttc,today);
         commande.insert(newC);
         System.out.println("Done 100% success");
-        GestionDesClient();
+        functionDisplayMenu();
     }
 
     public static  void closeout(){
+        System.out.println("Good bye");
+
+        return;
 
     }
+
     public static  void AjouterunClient(){
-        ClientDAOImpl clientDAO = new ClientDAOImpl();
+
           Scanner scan = new Scanner(System.in);
         System.out.println("Ajouter un Client ");
 
-        System.out.println("Ecrire nom ");
+        System.out.println("Ecrire le nom ");
         String name = scan.nextLine();
         System.out.println("Ecrire adresse ");
         String adresse = scan.nextLine();
@@ -281,25 +351,22 @@ public class Main {
         Client newclient = new Client(name,adresse,telephone);
         clientDAO.insert(newclient);
         System.out.println("Done 100% success");
-        GestionDesClient();
+        functionDisplayMenu();
     }
 
 
     public static  void SearchClient(){
-        ClientDAOImpl clientDAO = new ClientDAOImpl();
+
         Scanner scan = new Scanner(System.in);
         System.out.println("Chercher Client   ");
 
         System.out.println("Ecrire id ");
         int id = scan.nextInt();
 
-    Client RecivedCleint =  clientDAO.findById(id);
+       Client RecivedCleint =  clientDAO.findById(id);
         System.out.println("*************Result 100% success**************");
         if (RecivedCleint != null) {
-            System.out.println("client Name " + RecivedCleint.getNom());
-            System.out.println("client Adr " + RecivedCleint.getNom());
-            System.out.println("client tel " + RecivedCleint.getTelephone());
-            System.out.println("**********************************************");
+            RecivedCleint.Display();
         }else{
             System.out.println("Sorry Not Found ");
         }
@@ -317,10 +384,7 @@ public class Main {
         Client RecivedCleint =  clientDAO.findByName(nom);
         System.out.println("*************Result 100% success**************");
         if (RecivedCleint != null) {
-            System.out.println("client Name " + RecivedCleint.getNom());
-            System.out.println("client Adr " + RecivedCleint.getNom());
-            System.out.println("client tel " + RecivedCleint.getTelephone());
-            System.out.println("**********************************************");
+            RecivedCleint.Display();
         }else{
             System.out.println("Sorry Not Found ");
         }
@@ -330,16 +394,13 @@ public class Main {
 
     public static void getAllUsers() {
 
-        ClientDAOImpl clientDAO = new ClientDAOImpl();
-
         for (Client user: clientDAO.getAll()) {
-            System.out.println("**********************************************");
-            System.out.println("client Name " + user.getNom());
-            System.out.println("client Adr " + user.getNom());
-            System.out.println("client tel " + user.getTelephone());
-            System.out.println("**********************************************");
+         user.Display();
 
         }
 
     }
+
+
+
 }
